@@ -11,7 +11,7 @@ export default function Topbar() {
           <input
             type="text"
             placeholder="Search events, people..."
-            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aggie-light focus:border-transparent"
           />
           <span className="absolute left-3 top-2.5 text-gray-400">🔍</span>
         </div>
@@ -23,7 +23,7 @@ export default function Topbar() {
           <p className="text-sm font-medium text-gray-900">{CURRENT_USER.name}</p>
           <p className="text-xs text-gray-500">{CURRENT_USER.email}</p>
         </div>
-        <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white font-semibold">
+        <div className="w-10 h-10 bg-aggie-light rounded-full flex items-center justify-center text-white font-semibold">
           {CURRENT_USER.name.split(' ').map(n => n[0]).join('')}
         </div>
       </div>
