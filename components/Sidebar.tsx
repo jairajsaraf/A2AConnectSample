@@ -15,11 +15,12 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-white h-screen shadow-lg fixed left-0 top-0 flex flex-col">
+    <aside className="w-64 bg-aggie-maroon h-screen shadow-lg fixed left-0 top-0 flex flex-col">
       {/* Logo / Header */}
       <div className="p-6 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-primary-600">CMIS Portal</h1>
-        <p className="text-sm text-gray-500 mt-1">Engagement Platform</p>
+        <h1 className="text-2xl font-bold text-aggie-white">Aggie2Aggie Connect</h1>
+        <p className="text-sm text-aggie-gray-light mt-1">Engagement Platform</p>
+        
       </div>
 
       {/* Navigation */}
@@ -35,8 +36,8 @@ export default function Sidebar() {
                     flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
                     ${
                       isActive
-                        ? 'bg-primary-100 text-primary-700 font-semibold'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-aggie-white text-aggie-dark_maroon font-semibold'
+                        : 'text-aggie-white hover:bg-aggie-gray-light'
                     }
                     ${item.gaOnly ? 'border-t border-gray-200 mt-4 pt-4' : ''}
                   `}

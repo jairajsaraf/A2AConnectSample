@@ -43,19 +43,19 @@ export default function MentorshipPage() {
           </div>
 
           {/* What to expect */}
-          <div className="bg-blue-50 rounded-lg p-6">
+          <div className="bg-aggie-grays-200 rounded-lg p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">What to Expect</h2>
             <ul className="space-y-3 text-gray-700">
               <li className="flex items-start gap-2">
-                <span className="text-primary-600 mt-1">✓</span>
+                <span className="text-aggie-dark_maroon mt-1">✓</span>
                 <span>We'll review your preferences and match you with a suitable mentor</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-primary-600 mt-1">✓</span>
+                <span className="text-aggie-dark_maroon mt-1">✓</span>
                 <span>You'll receive an email introduction once matched</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-primary-600 mt-1">✓</span>
+                <span className="text-aggie-dark_maroon mt-1">✓</span>
                 <span>Typical matching time is 1-2 weeks</span>
               </li>
             </ul>
