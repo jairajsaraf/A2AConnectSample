@@ -1,6 +1,6 @@
-import AppMain from '../components/AppMain';
+import App from '@/components/App';
 
-// Root page - single page app with state management
+// Root page - Aggie2Aggie Connect Landing Page
 export default function Home() {
-  return <AppMain />;
+  return <App />;
 }
