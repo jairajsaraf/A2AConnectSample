@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation';
+import App from '@/components/App';
 
-// Root page - redirect to dashboard
+// Root page - Aggie2Aggie Connect Landing Page
 export default function Home() {
-  redirect('/dashboard');
+  return <App />;
 }
