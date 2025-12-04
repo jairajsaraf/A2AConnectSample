@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { User, Lock, Mail, ArrowRight, Users, Calendar, BarChart2, ChevronRight, X } from 'lucide-react';
 
 // Color Configuration (STRICT - Do not use standard Tailwind colors)
@@ -36,10 +37,24 @@ interface InputFieldProps {
 const App: React.FC = () => {
   const [view, setView] = useState<ViewType>('landing');
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleLoginClick = (): void => setView('login');
   const handleSignupClick = (): void => setView('signup');
   const handleBackToHome = (): void => setView('landing');
+
+  // Handle form submissions - navigate to dashboard
+  const handleLoginSubmit = (e: React.FormEvent): void => {
+    e.preventDefault();
+    // In a real app, you would validate credentials here
+    router.push('/dashboard');
+  };
+
+  const handleSignupSubmit = (e: React.FormEvent): void => {
+    e.preventDefault();
+    // In a real app, you would create account here
+    router.push('/dashboard');
+  };
 
   // ============================================
   // CORE COMPONENT STYLES
@@ -118,7 +133,7 @@ const App: React.FC = () => {
             <p className="text-[#D1D1D1] text-sm">Sign in to continue your Aggie journey</p>
           </div>
 
-          <form onSubmit={(e) => e.preventDefault()}>
+          <form onSubmit={handleLoginSubmit}>
             <InputField icon={Mail} type="text" label="Aggie ID or Email" placeholder="user@tamu.edu" />
             <InputField icon={Lock} type="password" label="Password" placeholder="••••••••" />
 
@@ -167,7 +182,7 @@ const App: React.FC = () => {
             <p className="text-[#D1D1D1] text-sm">Join the network of thousands of Aggies</p>
           </div>
 
-          <form onSubmit={(e) => e.preventDefault()}>
+          <form onSubmit={handleSignupSubmit}>
             <InputField icon={Mail} type="text" label="Aggie ID or Email" placeholder="user@tamu.edu" />
             <InputField icon={Lock} type="password" label="Password" placeholder="••••••••" />
             <InputField icon={Lock} type="password" label="Confirm Password" placeholder="••••••••" />
