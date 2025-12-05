@@ -277,11 +277,28 @@ export async function createRegistration(data: {
   const timestamp = new Date().toISOString();
   const registrationId = `ER-${data.student_name}-${Date.now()}`;
 
+  // Look up event_id from event_name
+  let eventId = '';
+  try {
+    const eventsRows = await getSheetData(SHEETS.EVENTS);
+    const events = rowsToObjects<{
+      event_id: string;
+      name: string;
+    }>(eventsRows);
+
+    const matchingEvent = events.find(e => e.name === data.event_name);
+    if (matchingEvent) {
+      eventId = matchingEvent.event_id;
+    }
+  } catch (error) {
+    console.error('Error looking up event_id:', error);
+  }
+
   const values = [[
     registrationId,           // registration_id
     timestamp,                // time_stamp
     data.event_name,          // event_name
-    '',                       // event_id
+    eventId,                  // event_id
     data.student_name,        // student_name
     data.student_email,       // student_email
     data.major_program,       // major_program
@@ -300,7 +317,7 @@ export async function createRegistration(data: {
   ]];
 
   await appendToSheet(SHEETS.EVENT_REGISTRATIONS, values);
-  
+
   return { registrationId, timestamp };
 }
 
