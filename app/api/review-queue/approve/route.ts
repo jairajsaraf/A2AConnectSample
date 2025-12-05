@@ -31,16 +31,16 @@ export async function POST(request: NextRequest) {
 
     const sheets = await getGoogleSheetsClient();
 
-    // Get all registrations from the Event_Registrations sheet
+    // Get all items from the GA_Review_Queue sheet
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: 'Event_Registrations',
+      range: 'GA_Review_Queue',
     });
 
     const rows = response.data.values || [];
     if (rows.length < 2) {
       return NextResponse.json(
-        { success: false, error: 'No registrations found' },
+        { success: false, error: 'No items found in review queue' },
         { status: 404 }
       );
     }
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     // Update the approved column
     const sheetRowNumber = rowIndex + 1;
     const columnLetter = String.fromCharCode(65 + approvedIndex);
-    const range = 'Event_Registrations!' + columnLetter + sheetRowNumber;
+    const range = 'GA_Review_Queue!' + columnLetter + sheetRowNumber;
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,

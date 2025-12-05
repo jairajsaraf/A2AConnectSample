@@ -7,9 +7,14 @@ interface ReviewItem {
   student_name: string;
   student_email: string;
   event_name: string;
+  major_program: string;
+  grad_year: string;
+  interests: string;
   needs_review: string;
-  review_status: string;
-  approved?: string;
+  approved: string;
+  review_notes: string;
+  reviewed_at: string;
+  processed: string;
 }
 
 export default function ReviewQueuePage() {
@@ -27,7 +32,8 @@ export default function ReviewQueuePage() {
       const data = await response.json();
 
       if (data.success) {
-        setReviewItems(data.data.pendingRegistrations || []);
+        // Use reviewQueue from GA_Review_Queue sheet
+        setReviewItems(data.data.reviewQueue || []);
       }
     } catch (error) {
       console.error('Error fetching review queue:', error);
@@ -56,7 +62,7 @@ export default function ReviewQueuePage() {
         setReviewItems((prevItems) =>
           prevItems.map((item) =>
             item.registration_id === registrationId
-              ? { ...item, approved: approved.toString() }
+              ? { ...item, approved: approved ? 'TRUE' : 'FALSE' }
               : item
           )
         );
@@ -144,7 +150,7 @@ export default function ReviewQueuePage() {
                 </div>
 
                 <div className="ml-6 flex items-center gap-3">
-                  {item.approved === undefined ? (
+                  {item.approved === '' || item.approved === undefined ? (
                     <>
                       <button
                         onClick={() =>
@@ -169,7 +175,7 @@ export default function ReviewQueuePage() {
                           : '✗ Reject'}
                       </button>
                     </>
-                  ) : item.approved === 'true' ? (
+                  ) : item.approved === 'TRUE' ? (
                     <div className="px-6 py-3 rounded-lg bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-400/40">
                       ✓ Approved
                     </div>

@@ -248,12 +248,18 @@ export async function getMentors() {
 export async function getGAReviewQueue() {
   const rows = await getSheetData(SHEETS.GA_REVIEW_QUEUE);
   return rowsToObjects<{
-    type: string;
-    request_id: string;
+    registration_id: string;
+    student_name: string;
     student_email: string;
-    interest_industry: string;
-    reason: string;
-    created_at: string;
+    event_name: string;
+    major_program: string;
+    grad_year: string;
+    interests: string;
+    needs_review: string;
+    approved: string;
+    review_notes: string;
+    reviewed_at: string;
+    processed: string;
   }>(rows);
 }
 
