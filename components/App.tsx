@@ -38,6 +38,82 @@ interface SelectFieldProps {
   error?: string;
 }
 
+// Component definitions (outside App to prevent re-creation on every render)
+const GlassCard: React.FC<GlassCardProps> = ({ children, className = "" }) => (
+  <div className={`backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl shadow-xl ${className}`}>
+    {children}
+  </div>
+);
+
+const PrimaryButton: React.FC<ButtonProps> = ({ children, onClick, className = "", type = "button", disabled = false }) => (
+  <button
+    type={type}
+    onClick={onClick}
+    disabled={disabled}
+    className={`px-6 py-3 rounded-xl font-bold transition-all transform hover:scale-105 active:scale-95 shadow-lg
+    bg-[#500000] text-white hover:bg-[#3C0000] border border-[#732f2f]/30 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+  >
+    {children}
+  </button>
+);
+
+const SecondaryButton: React.FC<ButtonProps> = ({ children, onClick, className = "" }) => (
+  <button
+    onClick={onClick}
+    className={`px-6 py-3 rounded-xl font-bold transition-all border border-[#D6D3C4]/50 text-[#D6D3C4] hover:bg-[#D6D3C4]/10 ${className}`}
+  >
+    {children}
+  </button>
+);
+
+const InputField: React.FC<InputFieldProps> = ({ icon: Icon, type, placeholder, label, value, onChange, error }) => (
+  <div className="mb-4">
+    <label className="block text-[#D1D1D1] text-sm mb-2 ml-1">{label}</label>
+    <div className="relative group">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#707070] group-focus-within:text-[#D6D3C4] transition-colors">
+        <Icon size={18} />
+      </div>
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        autoComplete="off"
+        className="w-full bg-[#202020] border border-[#535353] text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:border-[#D6D3C4] focus:ring-1 focus:ring-[#D6D3C4] transition-all placeholder-[#535353]"
+        placeholder={placeholder}
+      />
+    </div>
+    {error && <p className="text-red-400 text-xs mt-1 ml-1">{error}</p>}
+  </div>
+);
+
+const SelectField: React.FC<SelectFieldProps> = ({ icon: Icon, label, value, onChange, options, error }) => (
+  <div className="mb-4">
+    <label className="block text-[#D1D1D1] text-sm mb-2 ml-1">{label}</label>
+    <div className="relative group">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#707070] group-focus-within:text-[#D6D3C4] transition-colors z-10">
+        <Icon size={18} />
+      </div>
+      <select
+        value={value}
+        onChange={onChange}
+        className="w-full bg-[#202020] border border-[#535353] text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:border-[#D6D3C4] focus:ring-1 focus:ring-[#D6D3C4] transition-all appearance-none cursor-pointer"
+      >
+        {options.map((option) => (
+          <option key={option} value={option} className="bg-[#202020] text-white">
+            {option}
+          </option>
+        ))}
+      </select>
+      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#707070]">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+    {error && <p className="text-red-400 text-xs mt-1 ml-1">{error}</p>}
+  </div>
+);
+
 const App: React.FC = () => {
   const [view, setView] = useState<ViewType>('landing');
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
@@ -148,81 +224,6 @@ const App: React.FC = () => {
       setSignupLoading(false);
     }
   };
-
-  const GlassCard: React.FC<GlassCardProps> = ({ children, className = "" }) => (
-    <div className={`backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl shadow-xl ${className}`}>
-      {children}
-    </div>
-  );
-
-  const PrimaryButton: React.FC<ButtonProps> = ({ children, onClick, className = "", type = "button", disabled = false }) => (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`px-6 py-3 rounded-xl font-bold transition-all transform hover:scale-105 active:scale-95 shadow-lg
-      bg-[#500000] text-white hover:bg-[#3C0000] border border-[#732f2f]/30 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-    >
-      {children}
-    </button>
-  );
-
-  const SecondaryButton: React.FC<ButtonProps> = ({ children, onClick, className = "" }) => (
-    <button
-      onClick={onClick}
-      className={`px-6 py-3 rounded-xl font-bold transition-all border border-[#D6D3C4]/50 text-[#D6D3C4] hover:bg-[#D6D3C4]/10 ${className}`}
-    >
-      {children}
-    </button>
-  );
-
-  const InputField: React.FC<InputFieldProps> = ({ icon: Icon, type, placeholder, label, value, onChange, error }) => (
-    <div className="mb-4">
-      <label className="block text-[#D1D1D1] text-sm mb-2 ml-1">{label}</label>
-      <div className="relative group">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#707070] group-focus-within:text-[#D6D3C4] transition-colors">
-          <Icon size={18} />
-        </div>
-        <input
-          type={type}
-          value={value}
-          onChange={onChange}
-          autoComplete="off"
-          className="w-full bg-[#202020] border border-[#535353] text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:border-[#D6D3C4] focus:ring-1 focus:ring-[#D6D3C4] transition-all placeholder-[#535353]"
-          placeholder={placeholder}
-        />
-      </div>
-      {error && <p className="text-red-400 text-xs mt-1 ml-1">{error}</p>}
-    </div>
-  );
-
-  const SelectField: React.FC<SelectFieldProps> = ({ icon: Icon, label, value, onChange, options, error }) => (
-    <div className="mb-4">
-      <label className="block text-[#D1D1D1] text-sm mb-2 ml-1">{label}</label>
-      <div className="relative group">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#707070] group-focus-within:text-[#D6D3C4] transition-colors z-10">
-          <Icon size={18} />
-        </div>
-        <select
-          value={value}
-          onChange={onChange}
-          className="w-full bg-[#202020] border border-[#535353] text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:border-[#D6D3C4] focus:ring-1 focus:ring-[#D6D3C4] transition-all appearance-none cursor-pointer"
-        >
-          {options.map((option) => (
-            <option key={option} value={option} className="bg-[#202020] text-white">
-              {option}
-            </option>
-          ))}
-        </select>
-        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#707070]">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-      </div>
-      {error && <p className="text-red-400 text-xs mt-1 ml-1">{error}</p>}
-    </div>
-  );
 
   // LOGIN VIEW
   const LoginView: React.FC = () => (
