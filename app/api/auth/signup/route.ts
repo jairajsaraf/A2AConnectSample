@@ -5,7 +5,7 @@ import { createUser, getUserByEmail } from '@/lib/googleSheets';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, name, major_program, grad_year } = body;
+    const { email, password, name, major_program, grad_year, role } = body;
 
     // Validate required fields
     if (!email || !password || !name) {
@@ -32,6 +32,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate role
+    const validRoles = ['Student', 'Graduate Assistant (GA)', 'Mentor', 'Admin'];
+    if (role && !validRoles.includes(role)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid role selected' },
+        { status: 400 }
+      );
+    }
+
     // Check if user already exists
     const existingUser = await getUserByEmail(email);
     if (existingUser) {
@@ -52,7 +61,7 @@ export async function POST(request: NextRequest) {
       name,
       major_program: major_program || '',
       grad_year: grad_year || '',
-      role: 'student',
+      role: role || 'Student',
     });
 
     return NextResponse.json({
