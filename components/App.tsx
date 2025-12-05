@@ -312,7 +312,7 @@ const App: React.FC = () => {
               icon={User}
               type="text"
               label="Full Name"
-              placeholder="John Doe"
+              placeholder="Full Name"
               value={signupName}
               onChange={(e) => setSignupName(e.target.value)}
             />
@@ -329,7 +329,7 @@ const App: React.FC = () => {
               label="Role"
               value={signupRole}
               onChange={(e) => setSignupRole(e.target.value)}
-              options={['Student', 'Graduate Assistant (GA)', 'Mentor', 'Admin']}
+              options={['Student', 'Graduate Assistant (GA)']}
             />
             <InputField
               icon={Lock}
@@ -386,9 +386,6 @@ const App: React.FC = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-[#D1D1D1]">
-            <a href="#" className="hover:text-[#D6D3C4] transition-colors">Mentorship</a>
-            <a href="#" className="hover:text-[#D6D3C4] transition-colors">Events</a>
-            <a href="#" className="hover:text-[#D6D3C4] transition-colors">Resources</a>
             <button onClick={handleLoginClick} className="hover:text-white transition-colors">Log In</button>
             <button
               onClick={handleSignupClick}
@@ -477,9 +474,6 @@ const App: React.FC = () => {
                 Powerful tools designed to foster connection and growth within the university ecosystem.
               </p>
             </div>
-            <button className="hidden md:flex items-center text-[#D6D3C4] font-medium hover:text-white transition-colors mt-4 md:mt-0">
-              View all features <ChevronRight size={18} />
-            </button>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -511,7 +505,7 @@ const App: React.FC = () => {
               </p>
               <div className="w-full h-32 bg-gradient-to-t from-[#2F3E51]/20 to-transparent rounded-lg relative overflow-hidden">
                 <div className="absolute top-4 left-4 flex gap-2">
-                  <div className="px-2 py-1 bg-[#D6D3C4] text-black text-xs font-bold rounded">JAN 15</div>
+                  
                 </div>
               </div>
             </GlassCard>
