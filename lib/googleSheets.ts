@@ -140,7 +140,7 @@ export async function createUser(userData: {
 export async function getEvents() {
   try {
     const rows = await getSheetData(SHEETS.EVENTS);
-    
+
     if (rows.length < 2) {
       return [];
     }
@@ -159,14 +159,16 @@ export async function getEvents() {
     // Get registration counts from Event_Registrations sheet
     const regRows = await getSheetData(SHEETS.EVENT_REGISTRATIONS);
     const registrations = rowsToObjects<{
-      event_id: string;
+      event_name: string;
     }>(regRows);
 
-    // Count registrations per event
+    // Count registrations per event by event_name
     const registrationCounts = new Map<string, number>();
     registrations.forEach(reg => {
-      const count = registrationCounts.get(reg.event_id) || 0;
-      registrationCounts.set(reg.event_id, count + 1);
+      if (reg.event_name) {
+        const count = registrationCounts.get(reg.event_name) || 0;
+        registrationCounts.set(reg.event_name, count + 1);
+      }
     });
 
     // Map events to the format expected by the frontend
@@ -176,7 +178,7 @@ export async function getEvents() {
       event_date: event.date_time,
       description: event.description,
       capacity: parseInt(event.capacity) || 100,
-      registered_count: registrationCounts.get(event.event_id) || 0,
+      registered_count: registrationCounts.get(event.name) || 0,
     }));
   } catch (error) {
     console.error('Error getting events:', error);
