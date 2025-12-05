@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
         userId: result.userId,
         email,
         name,
+        role: role || 'Student',
       },
     });
   } catch (error) {
