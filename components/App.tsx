@@ -29,6 +29,15 @@ interface InputFieldProps {
   error?: string;
 }
 
+interface SelectFieldProps {
+  icon: React.ComponentType<{ size?: number }>;
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  options: string[];
+  error?: string;
+}
+
 const App: React.FC = () => {
   const [view, setView] = useState<ViewType>('landing');
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
@@ -45,6 +54,7 @@ const App: React.FC = () => {
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
+  const [signupRole, setSignupRole] = useState('Student');
   const [signupError, setSignupError] = useState('');
   const [signupLoading, setSignupLoading] = useState(false);
 
@@ -92,7 +102,7 @@ const App: React.FC = () => {
     setSignupError('');
 
     // Validation
-    if (!signupName || !signupEmail || !signupPassword || !signupConfirmPassword) {
+    if (!signupName || !signupEmail || !signupPassword || !signupConfirmPassword || !signupRole) {
       setSignupError('All fields are required');
       return;
     }
@@ -117,6 +127,7 @@ const App: React.FC = () => {
           name: signupName,
           email: signupEmail,
           password: signupPassword,
+          role: signupRole,
         }),
       });
 
@@ -176,9 +187,38 @@ const App: React.FC = () => {
           type={type}
           value={value}
           onChange={onChange}
+          autoComplete="off"
           className="w-full bg-[#202020] border border-[#535353] text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:border-[#D6D3C4] focus:ring-1 focus:ring-[#D6D3C4] transition-all placeholder-[#535353]"
           placeholder={placeholder}
         />
+      </div>
+      {error && <p className="text-red-400 text-xs mt-1 ml-1">{error}</p>}
+    </div>
+  );
+
+  const SelectField: React.FC<SelectFieldProps> = ({ icon: Icon, label, value, onChange, options, error }) => (
+    <div className="mb-4">
+      <label className="block text-[#D1D1D1] text-sm mb-2 ml-1">{label}</label>
+      <div className="relative group">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#707070] group-focus-within:text-[#D6D3C4] transition-colors z-10">
+          <Icon size={18} />
+        </div>
+        <select
+          value={value}
+          onChange={onChange}
+          className="w-full bg-[#202020] border border-[#535353] text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:border-[#D6D3C4] focus:ring-1 focus:ring-[#D6D3C4] transition-all appearance-none cursor-pointer"
+        >
+          {options.map((option) => (
+            <option key={option} value={option} className="bg-[#202020] text-white">
+              {option}
+            </option>
+          ))}
+        </select>
+        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#707070]">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
       </div>
       {error && <p className="text-red-400 text-xs mt-1 ml-1">{error}</p>}
     </div>
@@ -267,34 +307,41 @@ const App: React.FC = () => {
           </div>
 
           <form onSubmit={handleSignupSubmit}>
-            <InputField 
-              icon={User} 
-              type="text" 
-              label="Full Name" 
+            <InputField
+              icon={User}
+              type="text"
+              label="Full Name"
               placeholder="John Doe"
               value={signupName}
               onChange={(e) => setSignupName(e.target.value)}
             />
-            <InputField 
-              icon={Mail} 
-              type="email" 
-              label="Email" 
+            <InputField
+              icon={Mail}
+              type="email"
+              label="Email"
               placeholder="user@tamu.edu"
               value={signupEmail}
               onChange={(e) => setSignupEmail(e.target.value)}
             />
-            <InputField 
-              icon={Lock} 
-              type="password" 
-              label="Password" 
+            <SelectField
+              icon={Users}
+              label="Role"
+              value={signupRole}
+              onChange={(e) => setSignupRole(e.target.value)}
+              options={['Student', 'Graduate Assistant (GA)', 'Mentor', 'Admin']}
+            />
+            <InputField
+              icon={Lock}
+              type="password"
+              label="Password"
               placeholder="••••••••"
               value={signupPassword}
               onChange={(e) => setSignupPassword(e.target.value)}
             />
-            <InputField 
-              icon={Lock} 
-              type="password" 
-              label="Confirm Password" 
+            <InputField
+              icon={Lock}
+              type="password"
+              label="Confirm Password"
               placeholder="••••••••"
               value={signupConfirmPassword}
               onChange={(e) => setSignupConfirmPassword(e.target.value)}
