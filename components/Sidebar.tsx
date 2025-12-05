@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -14,6 +15,16 @@ const NAV_ITEMS = [
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Get user role from localStorage
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      setUserRole(user.role);
+    }
+  }, []);
 
   const handleLogout = () => {
     // Clear user data from localStorage
@@ -21,6 +32,15 @@ export default function Sidebar() {
     // Redirect to home page
     router.push('/');
   };
+
+  // Filter navigation items based on user role
+  const visibleNavItems = NAV_ITEMS.filter((item) => {
+    // If item is GA only, show only if user is a Graduate Assistant
+    if (item.gaOnly) {
+      return userRole === 'Graduate Assistant (GA)';
+    }
+    return true;
+  });
 
   return (
     <aside
@@ -41,7 +61,7 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 p-4 overflow-y-auto">
         <ul className="space-y-2">
-          {NAV_ITEMS.map((item) => {
+          {visibleNavItems.map((item) => {
             const isActive = pathname === item.href;
 
             return (
