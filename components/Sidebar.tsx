@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: '📊' },
@@ -13,11 +13,13 @@ const NAV_ITEMS = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
 
-  // TODO: wire this up to your real logout logic (NextAuth signOut, n8n, etc.)
   const handleLogout = () => {
-    console.log('Logout clicked');
-    // e.g. await signOut();
+    // Clear user data from localStorage
+    localStorage.removeItem('user');
+    // Redirect to home page
+    router.push('/');
   };
 
   return (

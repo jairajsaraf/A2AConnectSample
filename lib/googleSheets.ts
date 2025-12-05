@@ -6,6 +6,8 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 
 // Sheet names from your n8n workflows
 export const SHEETS = {
+  USERS: 'Users',
+  EVENTS: 'Events',  // ← MAKE SURE THIS IS HERE
   EVENT_REGISTRATIONS: 'Event_Registrations',
   MENTORSHIP_REQUESTS: 'Mentorship_Requests',
   MENTORS: 'Mentors',
@@ -53,36 +55,133 @@ export function rowsToObjects<T>(rows: string[][]): T[] {
   });
 }
 
-// Get events (you may need to create an Events sheet or derive from registrations)
-export async function getEvents() {
-  const rows = await getSheetData(SHEETS.EVENT_REGISTRATIONS);
-  const registrations = rowsToObjects<{
-    event_name: string;
-    event_id: string;
-  }>(rows);
-
-  // Get unique events with count
-  const eventMap = new Map<string, { event_id: string; event_name: string; registered_count: number }>();
+// Append a new row to a sheet
+export async function appendToSheet(sheetName: string, values: string[][]) {
+  const sheets = await getGoogleSheetsClient();
   
-  registrations.forEach(reg => {
-    const key = reg.event_name;
-    if (eventMap.has(key)) {
-      eventMap.get(key)!.registered_count++;
-    } else {
-      eventMap.set(key, {
-        event_id: reg.event_id || `EVT-${key.replace(/\s+/g, '-')}`,
-        event_name: reg.event_name,
-        registered_count: 1,
-      });
-    }
+  const response = await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_ID,
+    range: sheetName,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values,
+    },
   });
 
-  return Array.from(eventMap.values()).map(event => ({
-    ...event,
-    event_date: '2025-12-15', // You may want to add this to your sheet
-    description: `${event.event_name} event`,
-    capacity: 100, // You may want to add this to your sheet
-  }));
+  return response.data;
+}
+
+// ============================================
+// USER AUTHENTICATION FUNCTIONS
+// ============================================
+
+export interface User {
+  user_id: string;
+  email: string;
+  password_hash: string;
+  name: string;
+  major_program: string;
+  grad_year: string;
+  role: string;
+  created_at: string;
+}
+
+// Get user by email
+export async function getUserByEmail(email: string): Promise<User | null> {
+  try {
+    const rows = await getSheetData(SHEETS.USERS);
+    const users = rowsToObjects<User>(rows);
+    
+    const user = users.find(
+      u => u.email?.toLowerCase() === email.toLowerCase()
+    );
+    
+    return user || null;
+  } catch (error) {
+    console.error('Error getting user by email:', error);
+    return null;
+  }
+}
+
+// Create new user
+export async function createUser(userData: {
+  email: string;
+  password_hash: string;
+  name: string;
+  major_program?: string;
+  grad_year?: string;
+  role?: string;
+}) {
+  const userId = `USER-${Date.now()}`;
+  const timestamp = new Date().toISOString();
+
+  const values = [[
+    userId,                           // user_id
+    userData.email,                   // email
+    userData.password_hash,           // password_hash
+    userData.name,                    // name
+    userData.major_program || '',     // major_program
+    userData.grad_year || '',         // grad_year
+    userData.role || 'student',       // role
+    timestamp,                        // created_at
+  ]];
+
+  await appendToSheet(SHEETS.USERS, values);
+  
+  return { userId, timestamp };
+}
+
+// ============================================
+// EVENT FUNCTIONS
+// ============================================
+
+// Get events (you may need to create an Events sheet or derive from registrations)
+// Get all events from Events sheet
+export async function getEvents() {
+  try {
+    const rows = await getSheetData(SHEETS.EVENTS);
+    
+    if (rows.length < 2) {
+      return [];
+    }
+
+    const events = rowsToObjects<{
+      event_id: string;
+      name: string;
+      type: string;
+      date_time: string;
+      location: string;
+      capacity: string;
+      description: string;
+      target_audience: string;
+    }>(rows);
+
+    // Get registration counts from Event_Registrations sheet
+    const regRows = await getSheetData(SHEETS.EVENT_REGISTRATIONS);
+    const registrations = rowsToObjects<{
+      event_id: string;
+    }>(regRows);
+
+    // Count registrations per event
+    const registrationCounts = new Map<string, number>();
+    registrations.forEach(reg => {
+      const count = registrationCounts.get(reg.event_id) || 0;
+      registrationCounts.set(reg.event_id, count + 1);
+    });
+
+    // Map events to the format expected by the frontend
+    return events.map(event => ({
+      event_id: event.event_id,
+      event_name: event.name,
+      event_date: event.date_time,
+      description: event.description,
+      capacity: parseInt(event.capacity) || 100,
+      registered_count: registrationCounts.get(event.event_id) || 0,
+    }));
+  } catch (error) {
+    console.error('Error getting events:', error);
+    return [];
+  }
 }
 
 // Get registrations for a specific user
@@ -158,22 +257,6 @@ export async function getGAReviewQueue() {
   }>(rows);
 }
 
-// Append a new row to a sheet
-export async function appendToSheet(sheetName: string, values: string[][]) {
-  const sheets = await getGoogleSheetsClient();
-  
-  const response = await sheets.spreadsheets.values.append({
-    spreadsheetId: SHEET_ID,
-    range: sheetName,
-    valueInputOption: 'USER_ENTERED',
-    requestBody: {
-      values,
-    },
-  });
-
-  return response.data;
-}
-
 // Create a new registration
 export async function createRegistration(data: {
   event_name: string;
@@ -186,7 +269,7 @@ export async function createRegistration(data: {
   mentor_preferences?: string;
 }) {
   const timestamp = new Date().toISOString();
-  const registrationId = `ER-${data.student_name}${timestamp}`;
+  const registrationId = `ER-${data.student_name}-${Date.now()}`;
 
   const values = [[
     registrationId,           // registration_id

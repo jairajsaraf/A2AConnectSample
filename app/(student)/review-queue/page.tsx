@@ -2,7 +2,7 @@ export default function ReviewQueuePage() {
   return (
     <div className="space-y-8">
       {/* Header with gradient background */}
-      <div className="bg-gradient-to-r from-aggie-maroon to-aggie-dark_maroon rounded-xl shadow-lg p-8">
+      <div className="bg-gradient-to-r from-aggie-maroon to-aggie-dark_maroon rounded-xl shadow-lg p-8 mt-6">
         <h1 className="text-3xl font-bold text-white">GA Review Queue</h1>
         <p className="text-aggie-gray-light mt-2">Review and approve student registrations</p>
       </div>
