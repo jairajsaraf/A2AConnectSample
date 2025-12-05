@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMIS Assistant - Final Working Version</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #500000 0%, #800000 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 500px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: #500000;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .chat-header h2 { font-size: 20px; margin-bottom: 5px; }
+        .chat-header p { font-size: 13px; opacity: 0.9; }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .msg-wrapper {
+            display: flex;
+            width: 100%;
+            animation: slideIn 0.3s ease;
+        }
+
+        .msg-wrapper.user-msg { justify-content: flex-end; }
+        .msg-wrapper.bot-msg { justify-content: flex-start; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.5;
+            font-size: 14px;
+            word-wrap: break-word;
+        }
+
+        .user-msg .msg-bubble {
+            background: #500000;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-msg .msg-bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .typing {
+            display: none;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 12px;
+            width: fit-content;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .typing.show { display: block; }
+
+        .typing span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #500000;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing span:nth-child(1) { animation-delay: -0.32s; }
+        .typing span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .chat-input {
+            padding: 16px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chat-input input:focus { border-color: #500000; }
+
+        .chat-input button {
+            background: #500000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .chat-input button:hover { background: #700000; }
+        .chat-input button:disabled { background: #ccc; cursor: not-allowed; }
+
+        .login-screen {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .login-screen h3 {
+            color: #500000;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .login-screen input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .login-screen button {
+            width: 100%;
+            padding: 14px;
+            background: #500000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        .login-screen button:hover { background: #700000; }
+        .hide { display: none; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>🎓 CMIS Assistant</h2>
+            <p>Your 24/7 Engagement Helper</p>
+        </div>
+
+        <div id="loginScreen" class="login-screen">
+            <h3>Welcome to CMIS!</h3>
+            <input type="email" id="emailInput" placeholder="Enter your TAMU email" />
+            <input type="text" id="nameInput" placeholder="Your name (optional)" />
+            <button onclick="login()">Start Chatting</button>
+        </div>
+
+        <div id="chatScreen" class="hide">
+            <div class="chat-messages" id="messages"></div>
+            <div class="chat-input">
+                <input 
+                    type="text" 
+                    id="msgInput" 
+                    placeholder="Type your message..."
+                    onkeyup="if(event.key==='Enter') send()"
+                />
+                <button onclick="send()" id="sendBtn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WEBHOOK = 'https://cmisg16.app.n8n.cloud/webhook/cmis-chatbot';
+        let email = '';
+        let history = [];
+
+        function login() {
+            const e = document.getElementById('emailInput').value.trim();
+            if (!e || !e.includes('@tamu.edu')) {
+                alert('Please enter a valid TAMU email');
+                return;
+            }
+            email = e;
+            document.getElementById('loginScreen').classList.add('hide');
+            document.getElementById('chatScreen').classList.remove('hide');
+            
+            addMsg('bot', `Hi! I'm your CMIS assistant. I can help you with:<br>• Event information<br>• Mentorship questions<br>• Registration help<br>• Career guidance<br><br>What can I help you with today?`);
+            document.getElementById('msgInput').focus();
+        }
+
+        function addMsg(type, text) {
+            const msgs = document.getElementById('messages');
+            const wrapper = document.createElement('div');
+            wrapper.className = `msg-wrapper ${type}-msg`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'msg-bubble';
+            bubble.innerHTML = text;
+            
+            wrapper.appendChild(bubble);
+            msgs.appendChild(wrapper);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function showTyping() {
+            const msgs = document.getElementById('messages');
+            const typing = document.createElement('div');
+            typing.className = 'typing show';
+            typing.id = 'typing';
+            typing.innerHTML = '<span></span><span></span><span></span>';
+            msgs.appendChild(typing);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typing = document.getElementById('typing');
+            if (typing) typing.remove();
+        }
+
+        async function send() {
+            const input = document.getElementById('msgInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            addMsg('user', msg);
+            input.value = '';
+            document.getElementById('sendBtn').disabled = true;
+            showTyping();
+
+            try {
+                const res = await fetch(WEBHOOK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, email: email, history: history })
+                });
+
+                const data = await res.json();
+                hideTyping();
+
+                let reply = data.response || data.content || 
+                           (data.message && data.message.content) || 
+                           'I received your message!';
+
+                addMsg('bot', reply);
+
+                if (data.escalated) {
+                    setTimeout(() => addMsg('bot', '📧 A Graduate Assistant will reach out within 24 hours.'), 500);
+                }
+
+                history.push({ role: 'user', message: msg }, { role: 'assistant', message: reply });
+                if (history.length > 20) history = history.slice(-20);
+
+            } catch (err) {
+                hideTyping();
+                addMsg('bot', '⚠️ Sorry, I encountered an error. Please try again or email cmis@tamu.edu');
+                console.error(err);
+            }
+
+            document.getElementById('sendBtn').disabled = false;
+            input.focus();
+        }
+    </script>
+</body>
+</html>
